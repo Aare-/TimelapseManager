@@ -20,10 +20,10 @@ pref_cam="cam"
 pref_scr="screen"
 
 #defining functions
-SLEEP_PROGRESS=0
+PROGRESS_STEP=0
 function showProgress() {		
 	spinner="|"
-	case $(($SLEEP_PROGRESS%4)) in
+	case $(($PROGRESS_STEP%4)) in
 		[0]*)
 			spinner="\\"
 			;;
@@ -37,7 +37,7 @@ function showProgress() {
 			spinner="-"
 			;;		
 	esac	
-	SLEEP_PROGRESS=$(($SLEEP_PROGRESS+1))
+	PROGRESS_STEP=$(($PROGRESS_STEP+1))
 	echo -ne "Working $spinner \r"
 }
 
@@ -78,8 +78,9 @@ Please provide path to be searched for photos." >&2
 	exit 1	
 fi
 
-arr_cam=()
-arr_scr=()
+declare -a arr_cam=()
+declare -a arr_scr=()
+
 #scan path for the images and add them to array
 echo "Screnshoot prefix: $pref_scr
 Camera prefix: $pref_cam
@@ -88,10 +89,32 @@ Starting scan $search_path
 
 "
 
+# $1 - path
+function searchForImages() {
+	#arr=$3
+	for f in $( ls $1 ); do		
+		full_path="$1\\$f"
+		#if a directory search it
+		if [ -d $full_path ]; then			
+			searchForImages $full_path
+		else #if file then add to correct array			
+			if [[ $f = $pref_cam* ]]; then
+				arr_cam+=($full_path)
+			fi
+			if [[ $f = $pref_scr* ]]; then
+				arr_scr+=($full_path)
+			fi		
+		fi		
+	done
+}
 
+searchForImages $search_path
 
+echo ${arr_cam[@]}
+echo ${arr_scr[@]}
 
 #sort array by the creation time
+
 
 #merge images
 
