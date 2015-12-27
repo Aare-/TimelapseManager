@@ -19,6 +19,28 @@ where:
 pref_cam="cam"
 pref_scr="screen"
 
+#defining functions
+SLEEP_PROGRESS=0
+function showProgress() {		
+	spinner="|"
+	case $(($SLEEP_PROGRESS%4)) in
+		[0]*)
+			spinner="\\"
+			;;
+		[1]*)
+			spinner="|"
+			;;
+		[2]*)
+			spinner="/"
+			;;
+		[3]*)
+			spinner="-"
+			;;		
+	esac	
+	SLEEP_PROGRESS=$(($SLEEP_PROGRESS+1))
+	echo -ne "Working $spinner \r"
+}
+
 #parsing the parameters
 while getopts 'hc:s:' opt; do
 	case "$opt" in
@@ -48,9 +70,29 @@ shift $((OPTIND -1))
 
 search_path=${@:0:1}
 
+#check if path has been set
 if ! [[ $search_path ]] ; then
 	echo "
 Please provide path to be searched for photos." >&2
 	echo "$usage" >&2
 	exit 1	
 fi
+
+arr_cam=()
+arr_scr=()
+#scan path for the images and add them to array
+echo "Screnshoot prefix: $pref_scr
+Camera prefix: $pref_cam
+
+Starting scan $search_path
+
+"
+
+
+
+
+#sort array by the creation time
+
+#merge images
+
+
