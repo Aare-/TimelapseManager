@@ -8,13 +8,14 @@ usage="
 Program for merging chronolapse images captured from different sources. 
 Require imagemagick to be installed on the system, and accesible from bash.
 
-Arguments: [-h] [-c s] [-s s] PATH_TO_SCAN
+Arguments: [-h] [-c s] [-s s] [-i s] [-o s]
 
 where:
 	-h  show this help text
 	-c  sets the camera images prefix (default 'cam')
 	-s  sets the screnshoot images prefix (default 'screen')
-	PATH_TO_SCAN  path to the directory containing images (will search it recursivelly)"
+	-i  path to the directory containing images (will search it recursivelly)
+	-o  path to the directory for the output images"	
 
 pref_cam="cam"
 pref_scr="screen"
@@ -42,7 +43,7 @@ function showProgress() {
 }
 
 #parsing the parameters
-while getopts 'hc:s:' opt; do
+while getopts 'hc:s:i:o:' opt; do
 	case "$opt" in
 		h) echo "$usage"
 			exit	
@@ -52,6 +53,11 @@ while getopts 'hc:s:' opt; do
 			;;			
 
 		s) pref_scr=$OPTARG	
+			;;
+
+		i) search_path=$OPTARG
+			;;
+		o) out_path=$OPTARG
 			;;
 
 		:) 
@@ -68,15 +74,34 @@ done
 
 shift $((OPTIND -1))
 
-search_path=${@:0:1}
-
 #check if path has been set
-if ! [[ $search_path ]] ; then
+if ! [[ $search_path ]]; then
 	echo "
 Please provide path to be searched for photos." >&2
 	echo "$usage" >&2
 	exit 1	
 fi
+if ! [[ $out_path ]]; then
+	echo "
+Please provide output path for the results." >&2
+	echo "$usage" >&2
+	exit 1	
+else
+	if ! [ -d $out_path ]; then
+		echo "
+Output directory must exists" >&2
+		echo "$usage" >&2
+		exit 1	
+	fi
+	if [ "$(ls -A $out_path)" ]; then
+		echo "
+Output directory must be empty" >&2
+		echo "$usage" >&2
+		exit 1	
+	fi
+fi
+
+echo "S: $search_path $out_path"
 
 declare -a arr_cam=()
 declare -a arr_scr=()
@@ -110,12 +135,26 @@ function searchForImages() {
 
 searchForImages $search_path
 
-echo ${arr_cam[@]}
-echo ${arr_scr[@]}
+#echo ${arr_cam[@]}
+#echo ${arr_scr[@]}
 
 #sort array by the creation time
 
-
 #merge images
+echo "Merging images"
+cam_pos=0
+scr_pos=0
+while [[ $cam_pos -lt ${#arr_cam[@]} ]]; do
+	declare -a merged_cam=()
+	declare -a merged_scr=()
 
+	merged_cam+=(${arr_cam[$cam_pos]})
+	merged_scr+=(${arr_scr[$scr_pos]})	
+
+	cam_pos=$(($cam_pos+1))
+	scr_pos=$(($scr_pos+1))
+
+	echo " - M: ${merged_cam[@]} 
+	C: ${merged_scr[@]}"
+done
 
