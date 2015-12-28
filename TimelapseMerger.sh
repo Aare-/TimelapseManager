@@ -145,6 +145,8 @@ echo "Merging images"
 cam_pos=0
 scr_pos=0
 while [[ $cam_pos -lt ${#arr_cam[@]} ]]; do
+	showProgress()
+	
 	declare -a merged_cam=()
 	declare -a merged_scr=()
 
@@ -156,5 +158,7 @@ while [[ $cam_pos -lt ${#arr_cam[@]} ]]; do
 
 	echo " - M: ${merged_cam[@]} 
 	C: ${merged_scr[@]}"
+
+	
 done
 
