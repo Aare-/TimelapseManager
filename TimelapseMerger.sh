@@ -8,6 +8,8 @@ usage="
 Tool for merging chronolapse images captured from different sources. 
 Require imagemagick to be installed on the system, and accesible from bash.
 
+Requires imagemagick to be installed and accesible from the bash.
+
 Arguments: [-h] [-i s] [-o s] [-c s] [-s s] [-b s] [-t s] [-g s] [-r n]
 
 where:
@@ -30,6 +32,15 @@ bgcolor="#000000"
 tiles="3x3"
 geometry="660x"
 timeTreshold=45	
+
+#checking dependencies
+if ! type "$montage"&>/dev/null; then
+   echo "
+Imagemagick command 'montage' required, but not found.
+
+$usage" >&2
+		exit 1		
+fi
 
 #defining functions
 PROGRESS_STEP=0
